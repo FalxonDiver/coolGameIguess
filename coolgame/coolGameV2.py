@@ -2,6 +2,7 @@ import pygame
 import sys
 import random
 import time
+import wave
 
 # Initialize Pygame
 pygame.init()
@@ -37,6 +38,8 @@ hit = pygame.mixer.Sound('hit.mp3')
 hit.set_volume(0.5)
 die = pygame.mixer.Sound('death.mp3')
 die.set_volume(0.4)
+glove = pygame.mixer.Sound('Iglove.mp3')
+glove.set_volume(1)
 
 # Load Font
 waterFont = pygame.font.Font('Watermelon.ttf', 32)
@@ -247,7 +250,8 @@ def main():
                         health = random.choice([1, 2,])
                         new_enemy = Enemy(x, y, health)
                     if not pygame.sprite.spritecollide(new_enemy, enemies, False):
-                        enemies.add(new_enemy)  
+                        enemies.add(new_enemy)
+                        glove.play()
                         break
             print("Next Round Start!")
             print("Spawned " + str(ENEMY_WAVE_SIZE) + " Enemies")
