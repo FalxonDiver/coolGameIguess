@@ -5,7 +5,6 @@ import time
 
 # Initialize Pygame
 pygame.init()
-
 pygame.display.set_caption("Forosophobia")
 
 # Constants
@@ -37,6 +36,10 @@ hit = pygame.mixer.Sound('hit.mp3')
 hit.set_volume(0.5)
 die = pygame.mixer.Sound('death.mp3')
 die.set_volume(0.4)
+glove = pygame.mixer.Sound('Iglove.mp3')
+glove.set_volume(1)
+# Load Font
+waterFont = pygame.font.Font('Watermelon.ttf', 32)
 
 # Player class
 class Player(pygame.sprite.Sprite):
@@ -52,19 +55,19 @@ class Player(pygame.sprite.Sprite):
         self.invincible = False
 
     def update(self, keys, bullets):
-        if keys[pygame.K_a]:
+        if keys[pygame.K_a] and self.rect.left > 0:
             self.image = pygame.image.load('left.png').convert_alpha()
             self.image = pygame.transform.scale(self.image, (Pxsize, Pysize))
             self.rect.x -= PLAYER_SPEED
-        if keys[pygame.K_d]:
+        if keys[pygame.K_d] and self.rect.right < SCREEN_WIDTH:
             self.image = pygame.image.load('right.png').convert_alpha()
             self.image = pygame.transform.scale(self.image, (Pxsize, Pysize))
             self.rect.x += PLAYER_SPEED
-        if keys[pygame.K_w]:
+        if keys[pygame.K_w] and self.rect.top > 0:
             self.image = pygame.image.load('back.png').convert_alpha()
             self.image = pygame.transform.scale(self.image, (Pxsize, Pysize))
             self.rect.y -= PLAYER_SPEED
-        if keys[pygame.K_s]:
+        if keys[pygame.K_s] and self.rect.bottom < SCREEN_HEIGHT:
             self.image = pygame.image.load('standing.png').convert_alpha()
             self.image = pygame.transform.scale(self.image, (Pxsize, Pysize))
             self.rect.y += PLAYER_SPEED
@@ -214,7 +217,7 @@ def main():
             if player.take_damage():
                 player_health -= 1  # Subtract health when the player collides with an enemy
                 hit.play()
-                print(player_health)
+                print("Health: "+str(player_health))
 
         # Check for bullet-enemy collisions
         for bullet in bullets:
@@ -224,7 +227,7 @@ def main():
                 bullet.kill()
                 enemy.take_damage()
                 if enemy.health <= 0:
-                    score += 1  # Increase score when an enemy is destroyedd
+                    score += 1  # Increase score when an enemy is destroyed
         
         # Spawn enemies
         if not enemies and wave_countdown <= 0:
@@ -237,15 +240,20 @@ def main():
                     randY = random.randint(0, 2)
                     if randY == 0:
                         y = Ty
-                        health = random.choice([1, 2,])
+                        health = random.choice([1, 2, 3])
                         new_enemy = Enemy(x, y, health)
                     else:
                         y = By
                         health = random.choice([1, 2,])
                         new_enemy = Enemy(x, y, health)
                     if not pygame.sprite.spritecollide(new_enemy, enemies, False):
-                        enemies.add(new_enemy)  
+                        enemies.add(new_enemy)
                         break
+            randVoice = ["yikes.mp3", "timeTaxes.mp3", "payTaxes.mp3", "Iglove.mp3", "iDon'twannaPayTaxes.mp3"]
+            rando = random.choice(randVoice)
+            glove = pygame.mixer.Sound(rando)
+            glove.set_volume(0.2)
+            glove.play()
             print("Next Round Start!")
             print("Spawned " + str(ENEMY_WAVE_SIZE) + " Enemies")
             ENEMY_WAVE_SIZE += ENEMY_WAVE_INCREMENT
@@ -255,7 +263,8 @@ def main():
         if player_health == 0:
             die.play()
             time.sleep(0.2)
-            print("Player Died")
+            print("You died")
+            print("Your Score Was "+ str(score) +" Points")
             pygame.quit()
             sys.exit()
         
